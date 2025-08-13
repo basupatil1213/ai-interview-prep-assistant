@@ -1,3 +1,5 @@
+# Ignore JetBrains IDE project files
+.idea/
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
@@ -36,3 +38,8 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+application.yml
+application.properties
+
+.idea
