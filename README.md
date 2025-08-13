@@ -1,84 +1,89 @@
-# Quick Start Guide
 
-## 1. Build and Run
+# AI Interview Prep Assistant
+
+An advanced, actor-based interview simulation platform leveraging Akka Typed, Spring Boot, and OpenAI (via Spring AI) to deliver realistic, adaptive interview experiences. Includes REST API, terminal client, and extensible architecture for custom interview flows and feedback.
+
+## Features
+
+- **AI-Generated Questions:** Dynamic interview questions tailored to job title and topic.
+- **Conversational Flow:** Multi-turn Q&A with follow-up questions.
+- **Performance Feedback:** At interview end, receive actionable feedback on strengths, weaknesses, and improvement areas.
+- **Akka Actor System:** Scalable, resilient session and question management.
+- **Terminal & API Clients:** Interact via REST endpoints or shell script client.
+
+## Getting Started
+
+### Prerequisites
+- Java 17+
+- Maven
+- OpenAI API Key (set in environment or application config)
+
+### Build & Run
 ```bash
-# Clone/create project directory
-mkdir interview-prep-assistant
-cd interview-prep-assistant
-
-# Copy all code files to appropriate directories
-# (Use the structure shown at the beginning)
-
-# Build the project
 mvn clean install
-
-# Run the application
 mvn spring-boot:run
 ```
 
-## 2. Test via curl commands
+### API Usage
 
-### Start Interview
+**Start Interview**
 ```bash
 curl -X POST http://localhost:8080/api/interview/start \
   -H "Content-Type: application/json" \
   -d '{"jobTitle":"Backend Engineer","topic":"System Design"}'
 ```
 
-### Submit Response
+**Submit Response**
 ```bash
 curl -X POST http://localhost:8080/api/interview/respond \
   -H "Content-Type: application/json" \
   -d '{"sessionId":"your-session-id","response":"I would use microservices architecture..."}'
 ```
 
-### Check Session
+**Check Session**
 ```bash
 curl http://localhost:8080/api/interview/session/your-session-id
 ```
 
-### End Interview
+**End Interview & Get Feedback**
 ```bash
 curl -X POST http://localhost:8080/api/interview/end/your-session-id
 ```
 
-## 3. Use Terminal Script
+### Terminal Client
 ```bash
-# Make script executable
-chmod +x run_interview.sh
-
-# Run interactive terminal client
-./run_interview.sh
+chmod +x demoscript.sh
+./demoscript.sh
 ```
 
-## 4. Example Full Interview Flow
+## Architecture Overview
 
-1. Start interview with job title and topic
-2. Receive first question
-3. Provide detailed response
-4. Get feedback and next question
-5. Continue until satisfied
-6. End interview session
+- **Akka Typed Actors:**
+  - SessionStorageActor: Manages interview sessions
+  - QuestionGeneratorActor: Produces AI questions
+  - EvaluationActor: Handles response evaluation
+  - InterviewManagerActor: Orchestrates interview flow
+- **Spring Boot REST API:** Exposes endpoints for interview lifecycle
+- **Spring AI:** Integrates with OpenAI for question and feedback generation
 
-## 5. Akka Patterns Demonstrated
+## Akka Patterns Used
+- Tell: Async messaging
+- Ask: Request-response
+- Forward: Pipeline routing
+- Cluster: Distributed actors
 
-- **Tell Pattern**: Async messaging to session storage
-- **Ask Pattern**: Request-response for question generation
-- **Forward Pattern**: Routing responses through evaluation pipeline
-- **Cluster**: Distributed actors across multiple nodes
+## Extending the System
 
-## 6. Architecture Benefits
-
-- **Scalable**: Akka cluster handles load distribution
-- **Resilient**: Actor supervision and cluster recovery
-- **Responsive**: Async processing with Spring AI
-- **Real-time**: Live interview simulation with instant feedback
-
-## 7. Extend the System
-
-- Add more sophisticated LLM prompts
-- Implement different interview types
-- Add persistence with database
-- Create web frontend
+- Add new LLM prompts or interview types
+- Integrate database persistence
+- Build a React/Tailwind web frontend
 - Add real-time WebSocket communication
-- Implement user authentication
+- Implement authentication & user management
+
+## Contributing
+
+Pull requests are welcome! For major changes, please open an issue first to discuss your ideas.
+
+## License
+
+MIT License
