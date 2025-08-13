@@ -99,10 +99,31 @@ public class InterviewController {
     }
 
     @PostMapping("/end/{sessionId}")
-    public CompletionStage<ResponseEntity<String>> endInterview(@PathVariable String sessionId) {
+    public ResponseEntity<?> endInterview(@PathVariable String sessionId) {
         System.out.println("🏁 Ending interview session: " + sessionId);
-
-    sessionStorage.tell(new SessionStorageActor.EndSession(sessionId));
-    return java.util.concurrent.CompletableFuture.completedFuture(ResponseEntity.ok("Interview session ended successfully."));
+        Optional<InterviewSession> sessionOpt = AskPattern.ask(
+            sessionStorage,
+            (ActorRef<Optional<InterviewSession>> replyTo) -> new SessionStorageActor.GetSession(sessionId, replyTo),
+            Duration.ofSeconds(5),
+            actorSystem.scheduler()
+        ).toCompletableFuture().join();
+        if (sessionOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        InterviewSession session = sessionOpt.get();
+        session.setActive(false);
+        sessionStorage.tell(new SessionStorageActor.StoreSession(session));
+        // Build conversation history for feedback
+        StringBuilder conversationHistory = new StringBuilder();
+        for (QuestionResponse qr : session.getConversation()) {
+            conversationHistory.append("Q: ").append(qr.getQuestion()).append("\n");
+            conversationHistory.append("A: ").append(qr.getResponse()).append("\n");
+        }
+        String aiFeedback = aiQuestionService.generateInterviewFeedback(
+            session.getJobTitle(),
+            session.getTopic(),
+            conversationHistory.toString()
+        );
+        return ResponseEntity.ok("Interview ended successfully!\n\n" + aiFeedback);
     }
 }
