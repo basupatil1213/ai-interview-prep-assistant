@@ -10,80 +10,43 @@ An advanced, actor-based interview simulation platform leveraging Akka Typed, Sp
 - **Performance Feedback:** At interview end, receive actionable feedback on strengths, weaknesses, and improvement areas.
 - **Akka Actor System:** Scalable, resilient session and question management.
 - **Terminal & API Clients:** Interact via REST endpoints or shell script client.
+# AI Interview Prep Assistant
 
-## Getting Started
+AI Interview Prep Assistant is a backend-first interview simulation platform that uses Akka Typed actors and Spring Boot to orchestrate multi-turn interviews powered by large language models (via Spring AI / OpenAI). It provides a REST API, a terminal demo client, and an extensible actor-based architecture for session management, question generation, and automated feedback.
 
-### Prerequisites
-- Java 17+
-- Maven
-- OpenAI API Key (set in environment or application config)
+Features
+ - Adaptive, AI-driven interview questions
+ - Actor-based session orchestration using Akka Typed
+ - REST API for integration with web or CLI clients
+ - Pluggable evaluation pipeline for LLM-based feedback
 
-### Build & Run
-```bash
-mvn clean install
-mvn spring-boot:run
-```
+Tech stack
+ - Java 17, Maven
+ - Spring Boot, Spring AI
+ - Akka Typed
+ - OpenAI (configurable provider)
 
-### API Usage
+Quick start
+1. Ensure Java 17+ and Maven are installed
+2. Set OpenAI API key in environment or application config
+3. Build and run:
 
-**Start Interview**
-```bash
-curl -X POST http://localhost:8080/api/interview/start \
-  -H "Content-Type: application/json" \
-  -d '{"jobTitle":"Backend Engineer","topic":"System Design"}'
-```
+   mvn clean package
+   mvn spring-boot:run
 
-**Submit Response**
-```bash
-curl -X POST http://localhost:8080/api/interview/respond \
-  -H "Content-Type: application/json" \
-  -d '{"sessionId":"your-session-id","response":"I would use microservices architecture..."}'
-```
+Usage (examples)
+- POST /api/interview/start — start a new interview session
+- POST /api/interview/respond — submit an interview response
+- POST /api/interview/end/{sessionId} — finish and receive feedback
 
-**Check Session**
-```bash
-curl http://localhost:8080/api/interview/session/your-session-id
-```
+Extending
+- Add persistent storage (Postgres, MongoDB)
+- Implement a web frontend (React/Vue) that calls the REST API
+- Add authentication and user profile management
 
-**End Interview & Get Feedback**
-```bash
-curl -X POST http://localhost:8080/api/interview/end/your-session-id
-```
+Contributing
+- Open an issue to discuss significant changes
+- Follow the code style and include tests for new functionality
 
-### Terminal Client
-```bash
-chmod +x demoscript.sh
-./demoscript.sh
-```
-
-## Architecture Overview
-
-- **Akka Typed Actors:**
-  - SessionStorageActor: Manages interview sessions
-  - QuestionGeneratorActor: Produces AI questions
-  - EvaluationActor: Handles response evaluation
-  - InterviewManagerActor: Orchestrates interview flow
-- **Spring Boot REST API:** Exposes endpoints for interview lifecycle
-- **Spring AI:** Integrates with OpenAI for question and feedback generation
-
-## Akka Patterns Used
-- Tell: Async messaging
-- Ask: Request-response
-- Forward: Pipeline routing
-- Cluster: Distributed actors
-
-## Extending the System
-
-- Add new LLM prompts or interview types
-- Integrate database persistence
-- Build a React/Tailwind web frontend
-- Add real-time WebSocket communication
-- Implement authentication & user management
-
-## Contributing
-
-Pull requests are welcome! For major changes, please open an issue first to discuss your ideas.
-
-## License
-
-MIT License
+License
+MIT
