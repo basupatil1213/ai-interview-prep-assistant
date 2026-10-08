@@ -1,52 +1,80 @@
-
 # AI Interview Prep Assistant
 
-An advanced, actor-based interview simulation platform leveraging Akka Typed, Spring Boot, and OpenAI (via Spring AI) to deliver realistic, adaptive interview experiences. Includes REST API, terminal client, and extensible architecture for custom interview flows and feedback.
+A backend-first interview simulation platform that uses **Akka Typed** actors and **Spring Boot** to orchestrate realistic, multi-turn interviews powered by large language models (via **Spring AI** / OpenAI). It exposes a REST API, ships with a terminal demo client, and has an extensible actor-based architecture for session management, question generation, and automated feedback.
 
 ## Features
 
-- **AI-Generated Questions:** Dynamic interview questions tailored to job title and topic.
-- **Conversational Flow:** Multi-turn Q&A with follow-up questions.
-- **Performance Feedback:** At interview end, receive actionable feedback on strengths, weaknesses, and improvement areas.
-- **Akka Actor System:** Scalable, resilient session and question management.
-- **Terminal & API Clients:** Interact via REST endpoints or shell script client.
-# AI Interview Prep Assistant
+- **AI-generated questions** – dynamic interview questions tailored to the job title and topic
+- **Conversational flow** – multi-turn Q&A with AI-generated follow-up questions
+- **Performance feedback** – at the end of an interview, get actionable feedback on strengths, weaknesses, and areas to improve
+- **Akka actor system** – scalable, resilient session and question management
+- **Terminal & API clients** – interact through the REST endpoints or the `demoscript.sh` shell client
 
-AI Interview Prep Assistant is a backend-first interview simulation platform that uses Akka Typed actors and Spring Boot to orchestrate multi-turn interviews powered by large language models (via Spring AI / OpenAI). It provides a REST API, a terminal demo client, and an extensible actor-based architecture for session management, question generation, and automated feedback.
+## Architecture
 
-Features
- - Adaptive, AI-driven interview questions
- - Actor-based session orchestration using Akka Typed
- - REST API for integration with web or CLI clients
- - Pluggable evaluation pipeline for LLM-based feedback
+| Component | Responsibility |
+|---|---|
+| `InterviewController` | REST API under `/api/interview` |
+| `InterviewManagerActor` | Coordinates the interview flow |
+| `AiQuestionService` | Generates questions, follow-ups and end-of-interview feedback with Spring AI (`gpt-4o-mini`) |
+| `QuestionGeneratorActor` | Actor-based question generator with a built-in fallback question bank |
+| `EvaluationActor` | Per-answer evaluation hook (currently simulated scoring; extension point for LLM-based scoring) |
+| `SessionStorageActor` | Holds interview sessions in memory |
+| `ClusterManager`, `AkkaConfiguration`, `ClusterConfiguration` | Akka Typed / Akka Cluster setup |
 
-Tech stack
- - Java 17, Maven
- - Spring Boot, Spring AI
- - Akka Typed
- - OpenAI (configurable provider)
+## Tech stack
 
-Quick start
-1. Ensure Java 17+ and Maven are installed
-2. Set OpenAI API key in environment or application config
+- Java 17, Maven
+- Spring Boot 3, Spring AI
+- Akka Typed (actor + cluster)
+- OpenAI (`gpt-4o-mini` by default)
+
+## Quick start
+
+1. Make sure Java 17+ and Maven are installed.
+2. Provide your OpenAI API key through the `openai.api.key` property, for example:
+
+   ```bash
+   export OPENAI_API_KEY=sk-...
+   ```
+
 3. Build and run:
 
+   ```bash
    mvn clean package
    mvn spring-boot:run
+   ```
 
-Usage (examples)
-- POST /api/interview/start — start a new interview session
-- POST /api/interview/respond — submit an interview response
-- POST /api/interview/end/{sessionId} — finish and receive feedback
+The API is served at `http://localhost:8080/api/interview`.
 
-Extending
+## API
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/interview/start` | Start a session. Body: `{"jobTitle": "Backend Engineer", "topic": "System Design"}` |
+| `POST` | `/api/interview/respond` | Submit an answer. Body: `{"sessionId": "...", "response": "..."}` |
+| `GET` | `/api/interview/session/{sessionId}` | Get the current session state |
+| `POST` | `/api/interview/end/{sessionId}` | End the interview and receive feedback |
+
+### Terminal client
+
+With the server running (requires `curl` and `jq`):
+
+```bash
+./demoscript.sh
+```
+
+## Extending
+
 - Add persistent storage (Postgres, MongoDB)
-- Implement a web frontend (React/Vue) that calls the REST API
+- Build a web frontend (React/Vue) that calls the REST API
 - Add authentication and user profile management
 
-Contributing
-- Open an issue to discuss significant changes
-- Follow the code style and include tests for new functionality
+## Contributing
 
-License
-MIT
+- Open an issue to discuss significant changes
+- Follow the existing code style and include tests for new functionality
+
+## License
+
+Apache License 2.0 – see [LICENSE](LICENSE).
